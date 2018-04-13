@@ -8,9 +8,9 @@ from numpy import *
 class Player:
     tableCards = []  # 桌子上被打出的牌
     tableMingCards = []  # 桌子上的明牌，所有人杠和碰的牌
-    #@classmethod
-    #def nextPlayer(cls):
-    #    pass
+    # @classmethod
+    # def nextPlayer(cls):
+    # pass
 
     def __init__(self, handCards, newCard=[], mingCards=[], myTableCards=[]):
         self.handCards = list(handCards)
@@ -72,8 +72,8 @@ class Player:
         '''
         计算胡牌的收益，还没写好
         '''
-        huList=self.huList[:]
-        huProb=self.huProb()
+        huList = self.huList[:]
+        huProb = self.huProb()
 
 
         # print('handCards=', self.handCards)
@@ -108,6 +108,7 @@ class Player:
         '''
         杠牌
         '''
+        gangFlag = False
         for item in set(self.handCards):  # 自摸杠牌
             if self.handCards.count(item) == 4:
                 self.mingCards.extend([item] * 4)
@@ -118,6 +119,7 @@ class Player:
                 print('zimo gang:', self.mingCards)
                 for i in range(4): self.handCards.remove(item)
                 print('after gang, handCards=', self.handCards)
+                gangFlag = True
 
         if len(Player.tableCards) > 0:  # 杠别人牌
             lastCard = Player.tableCards[-1]
@@ -132,12 +134,18 @@ class Player:
                 while (lastCard in self.handCards):
                     self.handCards.remove(lastCard)
                 print('after gang, handCards=', self.handCards)
+                gangFlag = True
 
+        return gangFlag
 
+#需要更改成两个函数，
+# 1判断是否满足碰的条件，isPengable()
+# 2判断是否要碰,peng()
     def peng(self):
         '''
         碰牌
         '''
+        pengFlag = False
         if len(Player.tableCards) > 0:
             lastCard = Player.tableCards[-1]
             pairIndex = findPair(self.handCards)
@@ -152,6 +160,8 @@ class Player:
                         self.handCards.remove(lastCard)
                         self.handCards.remove(lastCard)
                         print('after peng, handCards=', self.handCards)
+                        pengFlag = True
+        return pengFlag
 
 
     def isHu(self, cards=[]):
@@ -205,8 +215,6 @@ class Player:
                 print('if next card is ', fullList[i])
                 huList.append(fullList[i])
         return huList
-
-
 
 
 def isTingPai(cards, numMing=0):
@@ -270,12 +278,12 @@ def getShun(cards_):
             cards.remove(item)
             cards.remove(item + 1)
             cards.remove(item + 2)
-            #print('cards=',cards)
-            #print('shunList=',shunList)
+            # print('cards=',cards)
+            # print('shunList=',shunList)
             shunList += getShun(cards)
         else:
             shunList += getShun(cards[1:])
-        #print(shunList)
+        # print(shunList)
         return shunList
 
 

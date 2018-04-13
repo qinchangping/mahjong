@@ -58,19 +58,29 @@ class GameState:
         self.p2 = Player(player2Cards)
         self.p3 = Player(player3Cards)
         self.p4 = Player(player4Cards)
+        self.players = [self.p1, self.p2, self.p3, self.p4]
         print('game initialized.')
         self.activePlayer = self.p1
         # self.activePlayer.newCard = dealCard(pileRest, start=False)
-        #self.activePlayer.play()
+        # self.activePlayer.play()
 
     def initGameRule(self):
         '''initialize the game'''
-        # 事先约定好的规则，封顶，断19之类
+        # 事先约定好的规则，封顶倍数，断19之类
         print('Rules are set as:')
 
     def nextPlayer(self):
+        '''根据玩家动作（碰、杠）决定下一个玩家是哪个'''
+        # 获得当前活动者编号，0~3
+        currentPlayerIndex = self.players.index(self.activePlayer)
+        next = self.self.players[(currentPlayerIndex + 1) % 4]
+        for i in range(1, 4):
+            if self.players[(currentPlayerIndex + i) % 4].gang() or \
+                    self.players[(currentPlayerIndex + i) % 4].peng():
+                next = self.self.players[(currentPlayerIndex + i) % 4]
+                break
+        return next
 
-        return self
 
     def getState(self):
         print('p1.handCards =', self.p1.handCards)
