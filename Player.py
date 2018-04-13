@@ -8,6 +8,9 @@ from numpy import *
 class Player:
     tableCards = []  # 桌子上被打出的牌
     tableMingCards = []  # 桌子上的明牌，所有人杠和碰的牌
+    #@classmethod
+    #def nextPlayer(cls):
+    #    pass
 
     def __init__(self, handCards, newCard=[], mingCards=[], myTableCards=[]):
         self.handCards = list(handCards)
@@ -20,6 +23,7 @@ class Player:
         self.huList = []  # whatHu(self.handCards)
         # self.value = [1.0] * 27
         self.fan = 1  # 计算翻数
+        self.score = 0
 
     def play(self):
         '''
@@ -32,10 +36,10 @@ class Player:
         self.huList = self.whatHu(self.handCards)
         print('Before new card, huList=', self.huList)
         if self.newCard[0] in self.huList:
-            #计算期望收益
+            # 计算期望收益
             print('Now you zimo le!')
         else:
-            self.calcP()
+            self.huProb()
         '''
         self.handCards += self.newCard
         self.handCards.sort()
@@ -64,10 +68,41 @@ class Player:
         # print('handCards=', self.handCards)
         return 0
 
+    def huGain(self):
+        '''
+        计算胡牌的收益，还没写好
+        '''
+        huList=self.huList[:]
+        huProb=self.huProb()
+
+
+        # print('handCards=', self.handCards)
+        return 0
+
         # @staticmethod
 
     # def updateTableCards(Play,dis):
     # Play.tableCards.append(dis)
+
+    def huProb(self):
+        '''
+        计算胡牌概率，所胡的牌在剩余未知牌中的张数
+        '''
+        # self.huList = self.whatHu(self.handCards)
+        # print('huList = ', self.huList)
+        huProb = []
+        if len(self.huList) > 0:
+            for i in range(len(self.huList)):
+                count = self.handCards.count(self.huList[i]) + \
+                        Player.tableCards.count(self.huList[i]) + \
+                        Player.tableMingCards.count(self.huList[i])  # 所胡的牌已经出现了几张
+                probility = (4.0 - float(count)) / float(
+                    108 - len(self.handCards) - len(Player.tableCards) - len(Player.tableMingCards))
+                huProb.append(probility)
+            print('huProb = ', huProb)
+        else:
+            print('no Hu yet')
+        return huProb
 
     def gang(self):
         '''
@@ -118,26 +153,6 @@ class Player:
                         self.handCards.remove(lastCard)
                         print('after peng, handCards=', self.handCards)
 
-
-    def calcP(self):
-        '''
-        计算胡牌概率，所胡的牌在剩余未知牌中的张数
-        '''
-        #self.huList = self.whatHu(self.handCards)
-        #print('huList = ', self.huList)
-        huProb = []
-        if len(self.huList) > 0:
-            for i in range(len(self.huList)):
-                count = self.handCards.count(self.huList[i]) + \
-                        Player.tableCards.count(self.huList[i]) + \
-                        Player.tableMingCards.count(self.huList[i])  # 所胡的牌已经出现了几张
-                probility = (4.0 - float(count)) / float(
-                    108 - len(self.handCards) - len(Player.tableCards) - len(Player.tableMingCards))
-                huProb.append(probility)
-            print('huProb = ', huProb)
-        else:
-            print('no Hu yet')
-        return huProb
 
     def isHu(self, cards=[]):
         '''返回：
@@ -192,43 +207,6 @@ class Player:
         return huList
 
 
-def generatePile():
-    '''返回：
-    随机排序生成的初始牌堆，类型list
-    '''
-    pileRandom = []
-    wan = [1, 2, 3, 4, 5, 6, 7, 8, 9] * 4
-    tong = [11, 12, 13, 14, 15, 16, 17, 18, 19] * 4
-    tiao = [21, 22, 23, 24, 25, 26, 27, 28, 29] * 4
-    pileInit = wan + tong + tiao
-    for i in range(108):
-        card = choice(pileInit)
-        pileRandom.append(card)
-        # print(card)
-        # pileInit=delete(pileInit,card)
-        del pileInit[pileInit.index(card)]
-        # print(len(pileInit))
-    # print(pileRandom)
-    return pileRandom
-
-
-def dealCard(pileRest, start=False):
-    '''
-    牌局初start=True，返回牌堆最顶上13张牌，类型list
-    之后start=False，返回牌堆最顶上1张牌，类型list
-    '''
-    retCard = []
-    if len(pileRest) > 0:
-        if start == True:  # 开局发牌13张
-            retCard = pileRest[0:13]
-            del pileRest[0:13]
-        else:
-            retCard = pileRest[0]
-            del pileRest[0]
-        print('after deal, %d cards left' % len(pileRest))
-    else:
-        print('no card left')
-    return retCard
 
 
 def isTingPai(cards, numMing=0):
@@ -286,13 +264,6 @@ def getShun(cards_):
     if len(cards) < 3:
         return shunList
     else:
-        # i = 0
-        # if cards[i] + 1 in cards and cards[i] + 2 in cards:
-        #    shunList.append([cards[i], cards[i] + 1, cards[i] + 2])
-        #    print(shunList)
-        #    cards.remove(cards[i])
-        #    cards.remove(cards[i]+1)此处card[i]已经不是上一行的card[i]了，兄弟！
-        #    cards.remove(cards[i]+2)
         item = cards[0]
         if item + 1 in cards and item + 2 in cards:
             shunList.append([item, item + 1, item + 2])
